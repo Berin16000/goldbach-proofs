@@ -678,16 +678,62 @@ function renderAgentRankingRow(entry, index) {
   return item;
 }
 
+let agentDimension = 'providers';
+let selectedModel = '';
+
 function renderAgentColumns(container, limit = Infinity) {
-  container.replaceChildren(...['models', 'harnesses'].map(dimension => {
-    const column = element('section', undefined, 'agent-ranking-column');
-    const title = dimension === 'models' ? (lang === 'zh' ? '模型' : 'Models') : (lang === 'zh' ? 'Harness 工具' : 'Harness tools');
-    const list = element('ol', undefined, 'ranking-list');
-    list.setAttribute('aria-label', title);
-    fillRankings(list, (agentRankingsData?.[dimension] || []).slice(0, limit), 'agents');
-    column.append(element('h3', title), list);
-    return column;
-  }));
+  const labels = lang === 'zh'
+    ? {providers: '模型厂商', models: '具体模型', harnesses: 'Harness 工具'}
+    : {providers: 'Model providers', models: 'Models', harnesses: 'Harness tools'};
+  const controls = element('div', undefined, 'agent-ranking-views');
+  const list = element('ol', undefined, 'ranking-list');
+  const rows = agentRankingsData?.[agentDimension] || [];
+  for (const [key, label] of Object.entries(labels)) {
+    const button = element('button', label);
+    button.type = 'button';
+    button.dataset.agentDimension = key;
+    button.setAttribute('aria-pressed', String(key === agentDimension));
+    button.onclick = () => {
+      agentDimension = key;
+      renderRankingMode();
+      container.querySelector('[data-agent-dimension="' + key + '"]')?.focus();
+    };
+    controls.append(button);
+  }
+  list.setAttribute('aria-label', labels[agentDimension]);
+  container.replaceChildren(controls);
+  if (agentDimension === 'models') {
+    const filter = element('select');
+    filter.setAttribute('aria-label', lang === 'zh' ? '选择模型' : 'Select model');
+    filter.append(new Option(lang === 'zh' ? '全部模型' : 'All models', ''));
+    for (const row of rows) filter.append(new Option(agentName(row.name), row.name));
+    filter.value = rows.some(row => row.name === selectedModel) ? selectedModel : '';
+    filter.onchange = () => {
+      selectedModel = filter.value;
+      renderRankingMode();
+      container.querySelector('select')?.focus();
+    };
+    controls.append(filter);
+  }
+  const index = agentDimension === 'models' && selectedModel
+    ? rows.findIndex(row => row.name === selectedModel) : -1;
+  if (index >= 0) list.append(renderAgentRankingRow(rows[index], index));
+  else fillRankings(list, rows.slice(0, limit), 'agents');
+  if (agentDimension === 'providers') {
+    rows.slice(0, limit).forEach((provider, i) => {
+      const item = list.children[i];
+      if (provider.name === 'unknown') {
+        item.querySelector('.agent-brand-name span:last-child').textContent =
+          lang === 'zh' ? '未识别厂商' : 'Unidentified provider';
+      }
+      const details = element('details', undefined, 'provider-models');
+      const models = element('ol', undefined, 'ranking-list');
+      fillRankings(models, provider.models, 'agents');
+      details.append(element('summary', lang === 'zh' ? '查看旗下模型' : 'Show contributing models'), models);
+      item.append(details);
+    });
+  }
+  container.append(list);
 }
 
 function renderFullRankings() {
@@ -711,7 +757,7 @@ function fillRankings(list, data, mode) {
 function renderRankingMode() {
   if (!rankingsData) return;
   const agents = rankingMode === 'agents';
-  const rows = agents ? (agentRankingsData?.models || []) : rankingsData[rankingMode];
+  const rows = agents ? (agentRankingsData?.[agentDimension] || []) : rankingsData[rankingMode];
   const columns = document.getElementById('agent-ranking-columns');
   columns.hidden = !agents;
   rankingsList.hidden = agents;
@@ -722,7 +768,7 @@ function renderRankingMode() {
   rankingsAll.textContent = agents ? (lang === 'zh' ? '查看完整榜单 ↗' : 'See full leaderboard ↗') :
     (lang === 'zh' ? '查看全部贡献者 ↗' : 'See all contributors ↗');
   document.getElementById('rankings-dialog-title').textContent = agents
-    ? (lang === 'zh' ? '模型与 Harness 贡献榜' : 'Model and harness contributions')
+    ? (lang === 'zh' ? '厂商、模型与 Harness 贡献榜' : 'Provider, model and harness contributions')
     : (lang === 'zh' ? '全部已核验贡献者' : 'All verified contributors');
   document.getElementById('rankings-summary').textContent = agents
     ? (lang === 'zh' ? '按本研究台累计首次核验积分排列。旧规则下首次通过的题每道计 1 分。' : 'Ranked by points from first accepted proofs on this research desk. Each first acceptance under the old rules counts for one point.')

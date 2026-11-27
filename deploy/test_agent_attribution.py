@@ -145,14 +145,14 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual([r['agent']['model'] for r in records], ['model-a-2026', 'model-b', 'unknown'])
         self.assertEqual(records[0]['agent']['source'], 'self_reported')
         ranks = self.helper.status(now=START+40)['agent_rankings']
-        self.assertEqual(ranks, {'models': [{'name': 'model-b', 'accepted': 1, 'points': 1}], 'harnesses': [{'name': 'codex', 'accepted': 1, 'points': 1}], 'proofs': 1})
+        self.assertEqual({k: v for k, v in ranks.items() if k != 'providers'}, {'models': [{'name': 'model-b', 'accepted': 1, 'points': 1}], 'harnesses': [{'name': 'codex', 'accepted': 1, 'points': 1}], 'proofs': 1})
 
     def test_first_acceptance_unknown_history_and_separate_models(self):
         with self.desk.transaction(write=True) as conn:
             for run, gap, model, harness, verdict in [
-                (1, 'first', 'model-a', 'codex', 'ACCEPTED'),
+                (1, 'first', 'gpt-6', 'codex', 'ACCEPTED'),
                 (2, 'first', 'model-b', 'cursor', 'ACCEPTED'),
-                (3, 'second', 'model-a-v2', 'codex', 'ACCEPTED'),
+                (3, 'second', 'gpt-6.2-sol', 'codex', 'ACCEPTED'),
                 (4, 'third', 'unknown', 'unknown', 'ACCEPTED'),
                 (6, 'fifth', 'model-c', 'unknown', 'ACCEPTED'),
                 (7, 'sixth', 'unknown', 'cursor', 'ACCEPTED'),
@@ -164,7 +164,11 @@ class AttributionTests(unittest.TestCase):
         ranks = status['agent_rankings']
         self.assertEqual(ranks['proofs'], 4)
         self.assertEqual(status['rankings']['proofs'], 5)
-        self.assertEqual(ranks['models'], [{'name': x, 'accepted': 1, 'points': 1} for x in ['model-a', 'model-a-v2', 'model-c']])
+        self.assertEqual(ranks['models'], [{'name': x, 'accepted': 1, 'points': 1} for x in ['gpt-6', 'gpt-6.2-sol', 'model-c']])
+        self.assertEqual(ranks['providers'], [
+            {'name': 'OpenAI', 'accepted': 2, 'points': 2, 'models': ranks['models'][:2]},
+            {'name': 'unknown', 'accepted': 1, 'points': 1, 'models': ranks['models'][2:]},
+        ])
         self.assertEqual(ranks['harnesses'], [{'name': 'codex', 'accepted': 2, 'points': 2}, {'name': 'cursor', 'accepted': 1, 'points': 1}])
         self.assertNotIn('ip_key', json.dumps(status))
         self.assertNotIn('token_hash', json.dumps(status))

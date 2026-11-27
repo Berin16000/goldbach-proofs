@@ -100,6 +100,31 @@ def model_ranking_name(value):
     return f"gpt-{match[1]}-{match[2]}" if match else label
 
 
+MODEL_PROVIDERS = {
+    "OpenAI": r"openai|gpt|chatgpt|o[134](?:-mini|-pro)?",
+    "Anthropic": r"anthropic|claude",
+    "Google": r"google|gemini|gemma",
+    "MiniMax": r"minimax",
+    "DeepSeek": r"deepseek",
+    "Alibaba": r"alibaba|qwen|qwq|qvq",
+    "Moonshot AI": r"moonshot|kimi",
+    "Meta": r"meta|llama",
+    "Mistral AI": r"mistral|mixtral|codestral|devstral|magistral",
+    "xAI": r"xai|grok",
+    "Z.ai": r"zai|z-ai|zhipu|glm",
+    "ByteDance": r"bytedance|doubao",
+    "Baidu": r"baidu|ernie",
+    "Tencent": r"tencent|hunyuan",
+}
+
+
+def model_provider(name):
+    for provider, aliases in MODEL_PROVIDERS.items():
+        if re.match(rf"^(?:{aliases})(?=$|[ ./_:-])", name):
+            return provider
+    return "unknown"
+
+
 def agent_metadata(value):
     """Normalize self-reported identifiers; missing data stays explicitly unknown."""
     if not isinstance(value, dict) or not {"model", "harness"} <= value.keys():
@@ -541,7 +566,16 @@ class Desk:
                     scores[name] += row["points"]
             return [{"name": name, "accepted": counts[name], "points": scores[name]}
                     for name in sorted(counts, key=lambda name: (-scores[name], -counts[name], name))]
-        return {"models": ranking(0), "harnesses": ranking(1), "proofs": len(winners)}
+        models = ranking(0)
+        providers = {}
+        for model in models:
+            name = model_provider(model["name"])
+            entry = providers.setdefault(name, {"name": name, "accepted": 0, "points": 0, "models": []})
+            entry["accepted"] += model["accepted"]
+            entry["points"] += model["points"]
+            entry["models"].append(model)
+        return {"models": models, "harnesses": ranking(1), "proofs": len(winners),
+                "providers": sorted(providers.values(), key=lambda row: (-row["points"], -row["accepted"], row["name"]))}
 
     def public_status(self):
         now = int(time.time())
