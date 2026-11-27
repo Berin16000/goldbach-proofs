@@ -100,27 +100,48 @@ def model_ranking_name(value):
     return f"gpt-{match[1]}-{match[2]}" if match else label
 
 
+# Model authors and model-family labels, not API hosts or coding tools.
+# Reference: https://openrouter.ai/models and https://openrouter.ai/rankings/
 MODEL_PROVIDERS = {
     "OpenAI": r"openai|gpt|chatgpt|o[134](?:-mini|-pro)?",
     "Anthropic": r"anthropic|claude",
     "Google": r"google|gemini|gemma",
-    "MiniMax": r"minimax",
+    "MiniMax": r"minimax|minimaxai",
     "DeepSeek": r"deepseek",
     "Alibaba": r"alibaba|qwen|qwq|qvq",
-    "Moonshot AI": r"moonshot|kimi",
-    "Meta": r"meta|llama",
-    "Mistral AI": r"mistral|mixtral|codestral|devstral|magistral",
-    "xAI": r"xai|grok",
-    "Z.ai": r"zai|z-ai|zhipu|glm",
-    "ByteDance": r"bytedance|doubao",
+    "Moonshot AI": r"moonshot|moonshotai|kimi",
+    "Meta": r"meta|meta-llama|llama",
+    "Mistral AI": r"mistral|mistralai|mixtral|codestral|devstral|magistral",
+    "xAI": r"xai|x-ai|grok",
+    "Z.ai": r"zai|z-ai|zhipu|zhipuai|glm|chatglm",
+    "ByteDance": r"bytedance|bytedance-seed|doubao",
     "Baidu": r"baidu|ernie",
     "Tencent": r"tencent|hunyuan",
+    "StepFun": r"stepfun|step-fun|step(?=[ -]?[0-9])",
+    "Microsoft": r"microsoft|phi|mai",
+    "NVIDIA": r"nvidia|nemotron",
+    "Amazon": r"amazon|amazon-nova",
+    "IBM": r"ibm|ibm-granite|granite",
+    "Cohere": r"cohere|command-r|command-a",
+    "AI21 Labs": r"ai21|ai21labs|jamba",
+    "Perplexity": r"perplexity|sonar",
+    "01.AI": r"01-ai|01\.ai|yi(?=-[0-9])",
+    "Xiaomi": r"xiaomi|mimo",
+    "InclusionAI": r"inclusionai|inclusion-ai|ling(?=[ -]?[0-9])",
+    "Meituan": r"meituan|longcat|long-cat",
+    "Allen Institute for AI": r"allenai|ai2|olmo",
+    "Nous Research": r"nousresearch|nous-research|hermes(?=[ -]?[0-9])",
+    "Hugging Face": r"huggingface|hugging-face|smollm",
+    "Naver": r"naver|hyperclova",
+    "LG AI Research": r"lgairesearch|lg-ai-research|exaone",
+    "NCSOFT": r"ncsoft|varco",
+    "Writer": r"writer|palmyra",
 }
 
 
 def model_provider(name):
     for provider, aliases in MODEL_PROVIDERS.items():
-        if re.match(rf"^(?:{aliases})(?=$|[ ./_:-])", name):
+        if re.match(rf"^(?:{aliases})(?=$|[0-9 ./_:-])", name):
             return provider
     return "unknown"
 

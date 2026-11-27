@@ -8,13 +8,24 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from deploy.desk import Desk, HARNESS_NAMES, agent_metadata, model_ranking_name
+from deploy.desk import Desk, HARNESS_NAMES, agent_metadata, model_provider, model_ranking_name
 from deploy import test_desk as desk_tests
 from deploy.test_desk import GAPS, START
 from tools import goldbach
 
 
 class AttributionTests(unittest.TestCase):
+    def test_model_provider_recognizes_author_and_family_aliases(self):
+        for name, provider in {
+            "gpt-6.2-sol": "OpenAI", "moonshotai/kimi-k3": "Moonshot AI",
+            "qwen3.7-plus": "Alibaba", "step-3.5-flash": "StepFun",
+            "glm5": "Z.ai", "nvidia/nemotron": "NVIDIA", "xiaomi/mimo": "Xiaomi",
+            "inclusionai/ling": "InclusionAI", "aws/claude": "unknown",
+            "codex": "unknown", "custom-model": "unknown",
+        }.items():
+            with self.subTest(name=name):
+                self.assertEqual(model_provider(name), provider)
+
     def setUp(self):
         self.helper = desk_tests.DeskTests()
         self.helper.setUp()
