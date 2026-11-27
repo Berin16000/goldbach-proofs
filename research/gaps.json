@@ -14226,6 +14226,88 @@
       "route_source": "dyadic-reflection"
     },
     {
+      "id": "L-goldbach-exception-four-sevenths-counting-bridge",
+      "statement": "let w := fun k : ℕ => if Nat.Prime k then Real.log (k:ℝ) else 0; let E := fun x : ℝ => Complex.exp (((2*Real.pi*x:ℝ):ℂ)*Complex.I); let S := fun (n : ℕ) (w : ℕ → ℝ) (t : ℝ) => Finset.sum (Finset.range (n+1)) (fun k => (w k:ℂ)*E ((k:ℝ)*t)); let Q := fun n : ℕ => (Nat.log 2 (n+2))^2; let arcs := fun n : ℕ => {t : ℝ | ∃ q a : ℕ, 1≤q ∧ q≤Q n ∧ a≤q ∧ Nat.Coprime a q ∧ |t-(a:ℝ)/(q:ℝ)| ≤ (Q n:ℝ)/((q:ℝ)*(n:ℝ))}; let f := fun (n : ℕ) (t : ℝ) => (S n w t)^2*E (-(n:ℝ)*t); let major := fun n : ℕ => intervalIntegral (fun t => (arcs n).indicator (f n) t) (0:ℝ) 1 MeasureTheory.volume; let minor := fun n : ℕ => (intervalIntegral (fun t => (arcs n)ᶜ.indicator (f n) t) (0:ℝ) 1 MeasureTheory.volume).re; let bad := fun n : ℕ => 4 ≤ n ∧ Even n ∧ ¬ ∃ p q : ℕ, Nat.Prime p ∧ Nat.Prime q ∧ p+q=n; (∃ (c : ℝ) (N : ℕ), 0<c ∧ ∀ n : ℕ, N≤n → Even n → c*(n:ℝ) ≤ (major n).re) → (∀ e : ℝ, 0 < e → ∃ (C : ℝ) (N : ℕ), 0 < C ∧ ∀ X : ℕ, N ≤ X → (Finset.sum ((Finset.Icc X (2*X)).filter Even) (fun n => (max 0 (-minor n))^2)) ≤ C * (X:ℝ) ^ (18/7 + e)) → (∀ e : ℝ, 0 < e → ∃ (C : ℝ) (N : ℕ), 0 < C ∧ ∀ X : ℕ, N ≤ X → (((Finset.Icc X (2*X)).filter bad).card : ℝ) ≤ C * (X:ℝ) ^ (4/7 + e))",
+      "plain_statement": {
+        "zh": "从主弧线性下界和次弧负部二阶矩推出二进区间例外计数。",
+        "en": "Derive the dyadic exceptional-set count from a positive major-arc floor and negative minor-arc energy."
+      },
+      "brief": {
+        "zh": "每个例外的全积分为零，因此负贡献至少为 cX。平方计数将指数 18/7+ε 降到 4/7+ε。",
+        "en": "Each exception has zero total integral, so its negative minor contribution is at least cX. Dividing the squared budget by c²X² uses the energy exponent 18/7 + ε."
+      },
+      "source": "https://arxiv.org/abs/2610.15559v1",
+      "program": "correlation",
+      "track": "exceptional-set-four-sevenths",
+      "depends_on": [
+        "L-goldbach-arc-major-floor",
+        "L-goldbach-arc-minor-saving"
+      ],
+      "role": "lemma",
+      "parallel": true,
+      "challenge_only": false,
+      "imports": [
+        "PEqualNP.Outside.L_goldbach_arc_major_floor"
+      ],
+      "module": "Conjectures.Goldbach.ExceptionFourSeventhsCountingBridge",
+      "file": "lean/Conjectures/Goldbach/ExceptionFourSeventhsCountingBridge.lean",
+      "route_source": "exceptional-set-four-sevenths"
+    },
+    {
+      "id": "L-goldbach-exception-four-sevenths-negative-energy",
+      "statement": "let w := fun k : ℕ => if Nat.Prime k then Real.log (k:ℝ) else 0; let E := fun x : ℝ => Complex.exp (((2*Real.pi*x:ℝ):ℂ)*Complex.I); let S := fun (n : ℕ) (w : ℕ → ℝ) (t : ℝ) => Finset.sum (Finset.range (n+1)) (fun k => (w k:ℂ)*E ((k:ℝ)*t)); let Q := fun n : ℕ => (Nat.log 2 (n+2))^2; let arcs := fun n : ℕ => {t : ℝ | ∃ q a : ℕ, 1≤q ∧ q≤Q n ∧ a≤q ∧ Nat.Coprime a q ∧ |t-(a:ℝ)/(q:ℝ)| ≤ (Q n:ℝ)/((q:ℝ)*(n:ℝ))}; let f := fun (n : ℕ) (t : ℝ) => (S n w t)^2*E (-(n:ℝ)*t); let major := fun n : ℕ => intervalIntegral (fun t => (arcs n).indicator (f n) t) (0:ℝ) 1 MeasureTheory.volume; let minor := fun n : ℕ => (intervalIntegral (fun t => (arcs n)ᶜ.indicator (f n) t) (0:ℝ) 1 MeasureTheory.volume).re; ∀ e : ℝ, 0 < e → ∃ (C : ℝ) (N : ℕ), 0 < C ∧ ∀ X : ℕ, N ≤ X → (Finset.sum ((Finset.Icc X (2*X)).filter Even) (fun n => (max 0 (-minor n))^2)) ≤ C * (X:ℝ) ^ (18/7 + e)",
+      "plain_statement": {
+        "zh": "在固定二进区间上证明次弧负贡献的平方和为 O(X^(18/7+ε))。",
+        "en": "Bound the squared negative minor-arc contributions on a dyadic interval by O(X^(18/7+ε))."
+      },
+      "brief": {
+        "zh": "只估计负部，允许正贡献。原主弧边界随 n 改变，不能直接对变动的掩码使用固定区间 Parseval。",
+        "en": "Exploit the negative-part restriction. The arc mask moves with n, so fixed-mask Parseval alone does not give the claim."
+      },
+      "source": "https://arxiv.org/abs/2610.15559v1",
+      "program": "correlation",
+      "track": "exceptional-set-four-sevenths",
+      "depends_on": [
+        "L-goldbach-wide-signed-unconditional",
+        "L-goldbach-frontier-uncond-deep-second-moment"
+      ],
+      "role": "lemma",
+      "parallel": true,
+      "challenge_only": false,
+      "imports": [
+        "PEqualNP.Outside.L_goldbach_frontier_uncond_deep_second_moment"
+      ],
+      "module": "Conjectures.Goldbach.ExceptionFourSeventhsNegativeEnergy",
+      "file": "lean/Conjectures/Goldbach/ExceptionFourSeventhsNegativeEnergy.lean",
+      "route_source": "exceptional-set-four-sevenths"
+    },
+    {
+      "id": "L-goldbach-exception-four-sevenths-unconditional",
+      "statement": "let bad := fun n : ℕ => 4 ≤ n ∧ Even n ∧ ¬ ∃ p q : ℕ, Nat.Prime p ∧ Nat.Prime q ∧ p+q=n; ∀ e : ℝ, 0 < e → ∃ (C : ℝ) (N : ℕ), 0 < C ∧ ∀ X : ℕ, N ≤ X → (((Finset.Icc 4 X).filter bad).card : ℝ) ≤ C * (X:ℝ) ^ (4/7 + e)",
+      "plain_statement": {
+        "zh": "无条件证明 E(X) ≪ε X^(4/7+ε)。",
+        "en": "Prove E(X) ≪ε X^(4/7+ε) unconditionally."
+      },
+      "brief": {
+        "zh": "对所有偶数 4≤n≤X 计数。公开基准为 Pintz–Althöfer v1 的 7/12；本题证明 4/7，节省 1/84，且不假设统一零点自由半平面。另一路径是直接控制例外集。",
+        "en": "Count all even integers in [4,X] that are not sums of two primes. Save 1/84 in the exponent against Pintz–Althöfer v1, with no zero-free hypothesis. Direct exceptional-set arguments are welcome."
+      },
+      "source": "https://arxiv.org/abs/2610.15559v1",
+      "program": "correlation",
+      "track": "exceptional-set-four-sevenths",
+      "depends_on": [
+        "L-goldbach-exception-four-sevenths-negative-energy",
+        "L-goldbach-exception-four-sevenths-counting-bridge"
+      ],
+      "role": "target",
+      "parallel": true,
+      "challenge_only": true,
+      "module": "Conjectures.Goldbach.ExceptionFourSeventhsUnconditional",
+      "file": "lean/Conjectures/Goldbach/ExceptionFourSeventhsUnconditional.lean",
+      "route_source": "exceptional-set-four-sevenths",
+      "imports": []
+    },
+    {
       "id": "L-goldbach-finite-phase-abel-two-ranges",
       "file": "lean/PEqualNP/Outside/L_goldbach_finite_phase_abel_two_ranges.lean",
       "module": "PEqualNP.Outside.L_goldbach_finite_phase_abel_two_ranges",
@@ -15816,7 +15898,9 @@
       ],
       "module": "Conjectures.Goldbach.DynManyRichTargets",
       "file": "lean/Conjectures/Goldbach/DynManyRichTargets.lean",
-      "imports": [],
+      "imports": [
+        "Conjectures.Goldbach.DynFirstMass"
+      ],
       "track": "representations",
       "role": "lemma",
       "route_source": "representations"
@@ -16982,6 +17066,21 @@
         "representations"
       ],
       "route_source": "dyadic-reflection"
+    },
+    {
+      "id": "exceptional-set-four-sevenths",
+      "title": {
+        "zh": "无条件哥德巴赫例外集 4/7 界",
+        "en": "An unconditional 4/7 Goldbach exceptional-set bound"
+      },
+      "description": {
+        "zh": "在同一例外集口径下，把 Pintz–Althöfer 公开预印本的 7/12 指数降至 4/7。",
+        "en": "Improve the exponent 7/12 in Pintz–Althöfer v1 to 4/7 on the same set without zero-free hypotheses."
+      },
+      "feeds": [
+        "arc-budget"
+      ],
+      "route_source": "exceptional-set-four-sevenths"
     },
     {
       "id": "explicit-skirt-inputs",
