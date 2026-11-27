@@ -19,7 +19,9 @@
   ],
   "module": "Conjectures.Goldbach.DynPathSecondMoment",
   "file": "lean/Conjectures/Goldbach/DynPathSecondMoment.lean",
-  "imports": [],
+  "imports": [
+    "Conjectures.Goldbach.DynFactorialCollisions"
+  ],
   "track": "representations",
   "role": "lemma"
 }
