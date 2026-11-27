@@ -18,7 +18,9 @@
   ],
   "module": "Conjectures.Goldbach.DynRobustArrivals",
   "file": "lean/Conjectures/Goldbach/DynRobustArrivals.lean",
-  "imports": [],
+  "imports": [
+    "Conjectures.Goldbach.DynDeletionLoss"
+  ],
   "track": "representations",
   "role": "lemma"
 }
