@@ -18,7 +18,9 @@
   ],
   "module": "Conjectures.Goldbach.DynManyRichTargets",
   "file": "lean/Conjectures/Goldbach/DynManyRichTargets.lean",
-  "imports": [],
+  "imports": [
+    "Conjectures.Goldbach.DynFirstMass"
+  ],
   "track": "representations",
   "role": "lemma"
 }
