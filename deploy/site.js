@@ -573,6 +573,7 @@ const harnessLabels = {
   "gemini-cli": "Gemini CLI",
   "opencode": "OpenCode",
   "kimi-code": "Kimi Code",
+  "minimax-code": "MiniMax Code",
   "qwen-code": "Qwen Code",
   "qoder": "Qoder",
   "qoder-cn": "Qoder CN",

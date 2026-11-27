@@ -20,6 +20,7 @@ HARNESS_NAMES = (
     'gemini-cli',
     'opencode',
     'kimi-code',
+    'minimax-code',
     'qwen-code',
     'qoder',
     'qoder-cn',

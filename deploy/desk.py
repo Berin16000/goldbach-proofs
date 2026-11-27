@@ -8,8 +8,7 @@ import time
 from collections import Counter
 from contextlib import closing, contextmanager
 
-LEASE_SECONDS = 45 * 60
-MAX_RESEARCH_SECONDS = 6 * 60 * 60
+NO_RESEARCH_DEADLINE = 253402300799  # Keep the existing integer lease protocol.
 SUBMISSION_SECONDS = 12 * 60 * 60
 CHECK_SECONDS = 3 * 60 * 60
 NETWORK_ACTIVE_LIMIT = 3
@@ -41,6 +40,7 @@ HARNESS_NAMES = (
     'gemini-cli',
     'opencode',
     'kimi-code',
+    'minimax-code',
     'qwen-code',
     'qoder',
     'qoder-cn',
@@ -199,6 +199,11 @@ class Desk:
                 gap TEXT PRIMARY KEY, opened_at INTEGER NOT NULL
             )""")
             now = int(time.time())
+            conn.execute("""
+                UPDATE goldbach_leases SET expires_at = ?, absolute_expires_at = ?
+                WHERE expires_at > ? AND expires_at < ? AND submitted_at IS NULL
+                    AND released_at IS NULL AND finished_at IS NULL
+            """, (NO_RESEARCH_DEADLINE, NO_RESEARCH_DEADLINE, now, NO_RESEARCH_DEADLINE))
             conn.executemany("INSERT OR IGNORE INTO goldbach_task_openings VALUES (?, ?)",
                              [(gap, min(now, (openings or {}).get(gap, now))) for gap in self.gaps])
             conn.execute("""CREATE TABLE IF NOT EXISTS goldbach_resolution_targets (
@@ -311,15 +316,17 @@ class Desk:
                                    for row in active if row["gap"] in self.gaps)
             available = (g for g in candidates if g not in proved and
                          (not load[g] or self.gaps[g].get("parallel") is True))
-            # Cover unclaimed statements first. Then balance independent attempts on open problems.
-            selected = min(available, key=lambda g: (load[g], self.gaps[g].get("role") == "endpoint", program_load[
-                self.gaps[g].get("program", "foundation")]), default=None)
+            # Balance parallel attempts, then prefer milestones tied to the research goal.
+            selected = min(available, key=lambda g: (
+                load[g],
+                self.gaps[g].get("role") not in {"endpoint", "target", "conditional"},
+                program_load[self.gaps[g].get("program", "foundation")],
+            ), default=None)
             if selected is None:
                 return error(409, "no_available_gap")
 
             token = secrets.token_urlsafe(32)
-            expires = now + LEASE_SECONDS
-            absolute = now + MAX_RESEARCH_SECONDS
+            expires = absolute = NO_RESEARCH_DEADLINE
             conn.execute("""
                 INSERT INTO goldbach_leases
                     (token_hash, gap, statement_sha256, handle, ip_key, claimed_at, expires_at, absolute_expires_at)
@@ -348,12 +355,7 @@ class Desk:
                 return error(410, "lease_expired")
 
             if action == "beat":
-                times = self.lease_times(lease)
-                if lease["pr"] is None:
-                    times["expires_at"] = min(now + LEASE_SECONDS, lease["absolute_expires_at"])
-                    conn.execute("UPDATE goldbach_leases SET expires_at = ? WHERE token_hash = ?",
-                                 (times["expires_at"], digest))
-                return 200, times
+                return 200, self.lease_times(lease)
             if action == "release":
                 if lease["run_id"] is not None:
                     return error(409, "check_already_started")
