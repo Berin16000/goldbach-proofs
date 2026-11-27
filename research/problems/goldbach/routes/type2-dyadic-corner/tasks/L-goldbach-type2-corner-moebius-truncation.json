@@ -1,6 +1,6 @@
 {
   "id": "L-goldbach-type2-corner-moebius-truncation",
-  "statement": "let μ := fun d : ℕ => ((ArithmeticFunction.moebius d : ℤ) : ℝ); ∀ (a U : ℕ), 1 < a → (∑ d ∈ (Nat.divisors a).filter (fun d => U < d), μ d) = - ∑ d ∈ (Nat.divisors a).filter (fun d => d ≤ U), μ d)",
+  "statement": "let μ := fun d : ℕ => ((ArithmeticFunction.moebius d : ℤ) : ℝ); ∀ (a U : ℕ), 1 < a → (∑ d ∈ (Nat.divisors a).filter (fun d => U < d), μ d) = - ∑ d ∈ (Nat.divisors a).filter (fun d => d ≤ U), μ d",
   "plain_statement": {
     "zh": "Möbius 截断恒等式：a>1 时，除数上 d>U 的 μ 和等于 d≤U 的 μ 和的相反数。",
     "en": "Truncated Möbius identity: for a>1, the μ-sum over divisors d>U is minus the μ-sum over d≤U."

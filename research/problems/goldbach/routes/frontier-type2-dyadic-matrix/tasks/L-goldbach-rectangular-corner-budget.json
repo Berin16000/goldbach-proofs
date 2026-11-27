@@ -1,6 +1,6 @@
 {
   "id": "L-goldbach-rectangular-corner-budget",
-  "statement": "∀ (n A D B H : ℕ), 0<n → 0<B → B≤H → let L := fun N : ℕ => ∑ q ∈ Finset.Icc 1 N,(q:ℝ)⁻¹ let C := fun u v : ℕ => (1+Real.log ((n:ℝ)+2))^2 + ((max A D:ℕ):ℝ)*(u.gcd v:ℝ)^2/((u:ℝ)*v) + (n:ℝ)/((u:ℝ)*v) * ((∑ q ∈ (u.gcd v).divisors.filter (·≤B),(q.gcd n:ℝ)*q/H) + ∑ q ∈ (u.gcd v).divisors.filter (B<·),(q.gcd n:ℝ)) (∑ u ∈ Finset.Icc 1 A,∑ v ∈ Finset.Icc 1 D,C u v) ≤ (A:ℝ)*D*(1+Real.log ((n:ℝ)+2))^2 + (A:ℝ)*D*L A*L D + ((n:ℝ)/B)*n.divisors.card*L (min A D)*L A*L D",
+  "statement": "∀ (n A D B H : ℕ), 0<n → 0<B → B≤H → let L := fun N : ℕ => ∑ q ∈ Finset.Icc 1 N,(q:ℝ)⁻¹; let C := fun u v : ℕ => (1+Real.log ((n:ℝ)+2))^2 + ((max A D:ℕ):ℝ)*(u.gcd v:ℝ)^2/((u:ℝ)*v) + (n:ℝ)/((u:ℝ)*v) * ((∑ q ∈ (u.gcd v).divisors.filter (·≤B),(q.gcd n:ℝ)*q/H) + ∑ q ∈ (u.gcd v).divisors.filter (B<·),(q.gcd n:ℝ)); (∑ u ∈ Finset.Icc 1 A,∑ v ∈ Finset.Icc 1 D,C u v) ≤ (A:ℝ)*D*(1+Real.log ((n:ℝ)+2))^2 + (A:ℝ)*D*L A*L D + ((n:ℝ)/B)*n.divisors.card*L (min A D)*L A*L D",
   "plain_statement": {
     "zh": "对于 PR 2468 的有理峰积分误差代价函数，当两个步长上界为 A、D，且 0<B≤H 时，矩形总预算由 AD 乘两个对数/调和项及 n/B 乘除数数目和三个调和项控制。",
     "en": "For the rational-peak integration cost from PR 2468, the rectangular aggregate with step caps A and D and 0<B≤H is bounded by AD times logarithmic and harmonic terms plus n/B times a divisor count and three harmonic factors."
