@@ -15745,7 +15745,9 @@
       ],
       "module": "Conjectures.Goldbach.DynFirstMass",
       "file": "lean/Conjectures/Goldbach/DynFirstMass.lean",
-      "imports": [],
+      "imports": [
+        "Conjectures.Goldbach.DynInteriorBox"
+      ],
       "track": "representations",
       "role": "lemma",
       "route_source": "representations"
