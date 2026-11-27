@@ -227,6 +227,99 @@
       "assumptions": [],
       "depends_on": [],
       "route": "representations"
+    },
+    {
+      "id": "L-goldbach-beaumont-central-local-prediction",
+      "statement": "let H := fun n : ℕ => ((Finset.range (n+1)).filter (fun p => p.Prime ∧ p ≤ n ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n)).card; let E := fun X : ℕ => (Finset.Icc X (2*X)).filter (fun n => Even n); let M := fun X : ℕ => (X:ℝ)/(Real.log (X:ℝ))^2; let R := fun n : ℕ => ((H n + H (n+2)):ℝ); ∀ ε : ℝ, 0 < ε → ∃ X₀ : ℕ, ∀ X ≥ X₀, ∃ b : ℕ → ℝ, (∀ n ∈ E X, M X ≤ b n) ∧ (∑ n ∈ E X, (R n-b n)^2) ≤ ε*(X:ℝ)*(M X)^2",
+      "plain_statement": {
+        "zh": "猜想：相邻中央命中的局部主项具有低均方误差",
+        "en": "Conjecture: low mean-square error for adjacent central arrivals"
+      },
+      "brief": {
+        "zh": "用局部因子构造预测。允许例外，控制误差平方总量；下游用已证的漏点能量引理。",
+        "en": "Build a local-factor predictor. Exceptions are allowed; bound the squared errors in aggregate."
+      },
+      "source": "https://github.com/CGandGameEngineLearner/goldbach-proofs/blob/main/research/problems/goldbach/routes/representations/beaumont-geometric-tools.md",
+      "program": "correlation",
+      "parallel": true,
+      "assumptions": [],
+      "depends_on": [],
+      "route": "representations"
+    },
+    {
+      "id": "L-goldbach-beaumont-central-prediction-transfer",
+      "statement": "let H := fun n : ℕ => ((Finset.range (n+1)).filter (fun p => p.Prime ∧ p ≤ n ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n)).card; let E := fun X : ℕ => (Finset.Icc X (2*X)).filter (fun n => Even n); let M := fun X : ℕ => (X:ℝ)/(Real.log (X:ℝ))^2; let R := fun n : ℕ => ((H n + H (n+2)):ℝ); (∀ ε : ℝ, 0 < ε → ∃ X₀ : ℕ, ∀ X ≥ X₀, ∃ b : ℕ → ℝ, (∀ n ∈ E X, M X ≤ b n) ∧ (∑ n ∈ E X, (R n-b n)^2) ≤ ε*(X:ℝ)*(M X)^2) → (∀ ε : ℝ, 0 < ε → ∃ X₀ : ℕ, ∀ X ≥ X₀, (((Finset.Icc X (2*X)).filter (fun n => Even n ∧ H n=0 ∧ H (n+2)=0)).card:ℝ) ≤ ε*(X:ℝ))",
+      "plain_statement": {
+        "zh": "用已证能量引理把局部预测转成双漏密度上界",
+        "en": "Transfer a local prediction to a double-miss bound"
+      },
+      "brief": {
+        "zh": "导入已证 DynExceptionEnergy，令 r(n)=H(n)+H(n+2)。从 X≥2 保证预算为正。预测假设由独立猜想提供。",
+        "en": "Import the verified DynExceptionEnergy, set r(n)=H(n)+H(n+2), and ensure positivity by taking X≥2. The prediction is a separate open input."
+      },
+      "source": "https://github.com/CGandGameEngineLearner/goldbach-proofs/blob/main/research/problems/goldbach/routes/representations/beaumont-geometric-tools.md",
+      "program": "correlation",
+      "parallel": true,
+      "assumptions": [],
+      "depends_on": [
+        "L-goldbach-dyn-exception-energy",
+        "L-goldbach-beaumont-central-local-prediction"
+      ],
+      "route": "representations"
+    },
+    {
+      "id": "L-goldbach-beaumont-one-sided-hole-cluster",
+      "statement": "let H := fun n : ℕ => ((Finset.range (n+1)).filter (fun p => p.Prime ∧ p ≤ n ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n)).card; ∀ ε : ℝ, 0 < ε → ∃ X₀ : ℕ, ∀ X ≥ X₀, ∀ y : ℕ, X ≤ y → y ≤ 2*X → ((((Finset.Icc y (y+Nat.sqrt X)).filter (fun n => Even n ∧ H n=0)).card):ℝ) ≤ ε*(Nat.sqrt X:ℝ)",
+      "plain_statement": {
+        "zh": "猜想：平方根长度短窗中的中央漏点不会聚集",
+        "en": "Conjecture: central misses do not cluster in square-root intervals"
+      },
+      "brief": {
+        "zh": "对区间位置要求一致，但仍允许每个小窗有漏点。用局部均方估计结合已证 DynExceptionEnergy。",
+        "en": "Require uniformity over window positions while permitting misses. Combine local mean-square estimates with verified DynExceptionEnergy."
+      },
+      "source": "https://github.com/CGandGameEngineLearner/goldbach-proofs/blob/main/research/problems/goldbach/routes/representations/beaumont-geometric-tools.md",
+      "program": "correlation",
+      "parallel": true,
+      "assumptions": [],
+      "depends_on": [],
+      "route": "representations"
+    },
+    {
+      "id": "L-goldbach-beaumont-alternate-normal-shift",
+      "statement": "let H := fun n : ℕ => ((Finset.range (n+1)).filter (fun p => p.Prime ∧ p ≤ n ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n)).card; let E := fun X : ℕ => (Finset.Icc X (2*X)).filter (fun n => Even n); ∃ δ : ℝ, 0 < δ ∧ ∃ X₀ : ℕ, ∀ X ≥ X₀, δ*(X:ℝ) ≤ (((E X).filter (fun n => 0 < H n ∧ 0 < H (n+2) ∧ 0 < H (n+4))).card:ℝ)",
+      "plain_statement": {
+        "zh": "猜想：正比例的连续三靶都具有中央表示",
+        "en": "Conjecture: a positive proportion of adjacent triples all have central hits"
+      },
+      "brief": {
+        "zh": "可用漏点密度和三个平移集合的并集界。也可直接尝试估计三个终点的联合分布。",
+        "en": "Use an exceptional-set estimate and a union bound over three shifts, or attack the joint distribution directly."
+      },
+      "source": "https://github.com/CGandGameEngineLearner/goldbach-proofs/blob/main/research/problems/goldbach/routes/representations/beaumont-geometric-tools.md",
+      "program": "correlation",
+      "parallel": true,
+      "assumptions": [],
+      "depends_on": [],
+      "route": "representations"
+    },
+    {
+      "id": "L-goldbach-beaumont-scaled-deletion-survival",
+      "statement": "let H := fun n : ℕ => ((Finset.range (n+1)).filter (fun p => p.Prime ∧ p ≤ n ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n)).card; let E := fun X : ℕ => (Finset.Icc X (2*X)).filter (fun n => Even n); let M := fun X : ℕ => (X:ℝ)/(Real.log (X:ℝ))^2; ∃ c δ : ℝ, 0 < c ∧ 0 < δ ∧ ∃ X₀ : ℕ, ∀ X ≥ X₀, ∀ D : Finset ℕ, (D.card:ℝ) ≤ c*(X:ℝ)/Real.log (X:ℝ) → δ*(X:ℝ) ≤ (((E X).filter (fun n => ∃ p ≤ n, p.Prime ∧ (n-p).Prime ∧ n ≤ 3*p ∧ 3*p ≤ 2*n ∧ n-p ∉ D)).card:ℝ)",
+      "plain_statement": {
+        "zh": "猜想：中央命中对删除长步长稳定",
+        "en": "Conjecture: central coverage survives long-step deletion"
+      },
+      "brief": {
+        "zh": "用已证 DynDeletionLoss 的配对计数思路，先选有足够多中央见证的靶点。对手可在看过模型后再选删除集。",
+        "en": "Adapt the verified pair-charging argument of DynDeletionLoss after finding many endpoints with rich central fibers. The deletion may be adversarial."
+      },
+      "source": "https://github.com/CGandGameEngineLearner/goldbach-proofs/blob/main/research/problems/goldbach/routes/representations/beaumont-geometric-tools.md",
+      "program": "correlation",
+      "parallel": true,
+      "assumptions": [],
+      "depends_on": [],
+      "route": "representations"
     }
   ],
   "links": [
@@ -360,6 +453,61 @@
       "explanation": {
         "zh": "对每对相邻偶数取较小的中央层数再求和。可尝试用两个卷积的共同下尾，或者用总量扣掉相邻振荡。",
         "en": "Sum the smaller central multiplicity on each adjacent pair. Estimate the common lower tail or subtract the adjacent variation from total mass."
+      }
+    },
+    {
+      "kind": "exploration",
+      "inputs": [
+        "L-goldbach-beaumont-central-local-prediction"
+      ],
+      "output": "L-goldbach-binary-pointwise-positivity",
+      "explanation": {
+        "zh": "用局部因子构造预测。允许例外，控制误差平方总量；下游用已证的漏点能量引理。",
+        "en": "Build a local-factor predictor. Exceptions are allowed; bound the squared errors in aggregate."
+      }
+    },
+    {
+      "kind": "exploration",
+      "inputs": [
+        "L-goldbach-beaumont-central-prediction-transfer"
+      ],
+      "output": "L-goldbach-binary-pointwise-positivity",
+      "explanation": {
+        "zh": "导入已证 DynExceptionEnergy，令 r(n)=H(n)+H(n+2)。从 X≥2 保证预算为正。预测假设由独立猜想提供。",
+        "en": "Import the verified DynExceptionEnergy, set r(n)=H(n)+H(n+2), and ensure positivity by taking X≥2. The prediction is a separate open input."
+      }
+    },
+    {
+      "kind": "exploration",
+      "inputs": [
+        "L-goldbach-beaumont-one-sided-hole-cluster"
+      ],
+      "output": "L-goldbach-binary-pointwise-positivity",
+      "explanation": {
+        "zh": "对区间位置要求一致，但仍允许每个小窗有漏点。用局部均方估计结合已证 DynExceptionEnergy。",
+        "en": "Require uniformity over window positions while permitting misses. Combine local mean-square estimates with verified DynExceptionEnergy."
+      }
+    },
+    {
+      "kind": "exploration",
+      "inputs": [
+        "L-goldbach-beaumont-alternate-normal-shift"
+      ],
+      "output": "L-goldbach-binary-pointwise-positivity",
+      "explanation": {
+        "zh": "可用漏点密度和三个平移集合的并集界。也可直接尝试估计三个终点的联合分布。",
+        "en": "Use an exceptional-set estimate and a union bound over three shifts, or attack the joint distribution directly."
+      }
+    },
+    {
+      "kind": "exploration",
+      "inputs": [
+        "L-goldbach-beaumont-scaled-deletion-survival"
+      ],
+      "output": "L-goldbach-binary-pointwise-positivity",
+      "explanation": {
+        "zh": "用已证 DynDeletionLoss 的配对计数思路，先选有足够多中央见证的靶点。对手可在看过模型后再选删除集。",
+        "en": "Adapt the verified pair-charging argument of DynDeletionLoss after finding many endpoints with rich central fibers. The deletion may be adversarial."
       }
     }
   ],
