@@ -43,7 +43,7 @@ description: 为哥德巴赫研究台及分站自动盘点剩余困难命题，�
 1. **读取**：从研究台快照取得父题 ID、冻结声明和基线 Git SHA。对原声明 UTF-8 字节计算 SHA-256。读取父题、已完成输入和在途任务，先查重。
 2. **拆解**：将数学家的意图写入 `motivation`。每条子题给出独立 Lean 声明、显式前提、中英文解释、证明提示、所属路线、来源和依赖 ID。用 `links` 指向下游：`input` 提供必要步骤或可复用输入，`exploration` 是探索，`sufficient_reduction` 要列全输入并提供组合引理 `bridge`。检查组合引理的类型确实把这些输入推到父题。证明状态始终读取权威流水线裁决。
 3. **校验**：先用 Draft 2020-12 验证 JSON 结构，再验证父题哈希、ID 唯一性、引用在本台存在、路线存在、依赖无环和双语语义。服务端从 ID 派生固定文件名与模块名；v1 新题使用 Mathlib 并遵循该台的 program/role 规则。对已合入的依赖按下文登记可导入引理；新路线需要扩展协议；v1 的 `route_note` 更新父题对应路线的双语说明。仅调整说明时允许空任务列表。最后运行仓库目录测试和固定版本 Lean。
-4. **交付变更 PR**：将变更集落实到对应目录，在功能分支提交并推送。用 PR 正文记录父题、数学动机、新增命题、依赖关系、声明变化和待解决输入。把 PR 链接交给 lifesize 审核；不代替管理员合并。研究目录发布器核对合并身份和 main 上确切 SHA 的 `Goldbach CI / catalogue release` Check。变更集是 skill 的逐题交换格式；发布入口是 GitHub PR。
+4. **交付变更 PR**：将变更集落实到对应目录，在功能分支提交并推送。用 PR 正文记录父题、数学动机、新增命题、依赖关系、声明变化和待解决输入。检查通过后，使用当前有目录发布权限的 GitHub 账号 squash 合并，并继续跟进发布。只有遇到权限不足、核验失败或明确要求只提交草案时，才暂停并报告状态。研究目录发布器核对合并身份和 main 上确切 SHA 的 `Goldbach CI / catalogue release` Check。变更集是 skill 的逐题交换格式；发布入口是 GitHub PR。
 
 ## 定位缺口
 
@@ -84,6 +84,6 @@ description: 为哥德巴赫研究台及分站自动盘点剩余困难命题，�
 
 1. 运行 `python research/build_catalogue.py`、`python -B -m unittest research.test_catalogue research.test_route_sources deploy.test_landau` 和 `git diff --check`。人工核对中英文描述与 Lean 类型是否一致，尤其是自然数减法、整除、求和括号和存在量词。若实际需要导入其他已证引理，核对它已存在于受信基线，提交者能够按导入规则使用。
 2. 参照 [Desk 测试](../../../deploy/test_desk.py)，用临时 SQLite 初始化各受影响的 Desk，调用 `/api/desk/claim`，逐一验证新增 ID 返回 201 且领取对应题目。验证过程使用隔离租约。
-3. 创建 PR 后核对 `Goldbach CI / catalogue PR`，修正在预检中发现的问题。管理员审核后，由项目所有者或获授权的数学任务发布者用自己的 GitHub 账号合并到 main。
+3. 创建 PR 后核对 `Goldbach CI / catalogue PR`，修正在预检中发现的问题。完成数学审核和仓库检查后，用项目所有者或获授权的数学任务发布者账号 squash 合并到 main。默认继续执行下一步，直到线上题单回读成功。
 4. 合并后查看该 SHA 的 `Goldbach CI / catalogue release` 和网站 `research-changes`，检查生产快照里的新增 ID 和冻结声明。需要诊断发布时参见[自动发布运维](../../../deploy/catalogue-release.md)。不要把 PR 检查通过或合并动作单独报告为已上线。
 5. 给出 PR、CI、受影响研究台与任务链接。区分目录类型检查与提交者的 `Goldbach CI / formal Lean verdict` 及任务台裁决。
